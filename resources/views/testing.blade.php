@@ -21,10 +21,11 @@
         cluster: 'eu',
     });
 
-    var channel = pusher.subscribe('payment-request');
-    channel.bind('new-payment-request', function(data) {
-        console.log(data)
-        alert(JSON.stringify(data))
+    var channel = pusher.subscribe('monobank');
+
+    channel.bind('currency-updated', function() {
+        console.log('Received event')
+        alert('Received event')
     });
 </script>
 </body>
