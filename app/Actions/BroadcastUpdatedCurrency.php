@@ -3,7 +3,7 @@
 namespace App\Actions;
 
 use App\Actions\Monobank\GetCurrency;
-use App\Events\Monobank\CurrencyUpdated;
+use App\Events\Monobank\CurrencyUpdatedEvent;
 use Cache;
 use Illuminate\Console\Command;
 use Lorisleiva\Actions\Concerns\AsAction;
@@ -12,19 +12,30 @@ class BroadcastUpdatedCurrency
 {
     use AsAction;
 
+    private string $data;
+    private array $changes = [];
+
     public string $commandSignature = 'monobank:broadcast-currency-updated';
 
     public function handle(): void
     {
-        $data = GetCurrency::run();
+        $this->data = GetCurrency::run();
 
-        $previousFingerprint = Cache::get('monobank_currency_md5');
-        $currentFingerprint = md5($data);
-
-        if($previousFingerprint !== $currentFingerprint) {
-            Cache::rememberForever('monobank_currency_md5', fn() => md5($data));
-            event(new CurrencyUpdated());
+        if ($this->isCurrencyUpdated()) {
+            event(new CurrencyUpdatedEvent());
         }
+    }
+
+    public function isCurrencyUpdated(): bool
+    {
+        $previousFingerprint = Cache::get('monobank_currency_md5');
+        $currentFingerprint = md5($this->data);
+
+        if ($previousFingerprint !== $currentFingerprint) {
+            Cache::put('monobank_currency_md5', $currentFingerprint);
+        }
+
+        return $previousFingerprint !== $currentFingerprint;
     }
 
     public function asCommand(Command $command): void

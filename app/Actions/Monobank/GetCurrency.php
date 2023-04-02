@@ -5,6 +5,7 @@ namespace App\Actions\Monobank;
 use App\Exceptions\Monobank\BaseException;
 use App\Exceptions\Monobank\ExceptionHandler;
 use Cache;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 use Lorisleiva\Actions\Concerns\AsAction;
 use Storage;
@@ -14,20 +15,27 @@ class GetCurrency
 {
     use AsAction;
 
+    private Response $response;
+
     public function handle()
     {
-        $response = Http::get('https://api.monobank.ua/bank/currency');
+        $this->response = Http::get('https://api.monobank.ua/bank/currency');
 
-        $filePath = 'monobank' . DIRECTORY_SEPARATOR . 'currency' . DIRECTORY_SEPARATOR .
-            now()->format('Y-m-d H-i-s')
-            . ' ' . $response->status();
+        $this->saveResponse();
 
-        Storage::disk('public')->put($filePath, $response);
-
-        if ($response->failed()) {
-            throw ExceptionHandler::make($response);
+        if ($this->response->failed()) {
+            throw ExceptionHandler::make($this->response);
         }
 
-        return $response->body();
+        return $this->response->body();
+    }
+
+    public function saveResponse():void
+    {
+        $filePath = 'monobank' . DIRECTORY_SEPARATOR . 'currency' . DIRECTORY_SEPARATOR .
+            now()->format('Y-m-d H-i-s')
+            . ' ' . $this->response->status();
+
+        Storage::disk('public')->put($filePath, $this->response);
     }
 }

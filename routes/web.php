@@ -1,7 +1,9 @@
 <?php
 
-use App\Events\Monobank\CurrencyUpdated;
+use App\Http\Controllers\ProfileController;
+use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 /*
 |--------------------------------------------------------------------------
@@ -9,14 +11,10 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 |
 | Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the "web" middleware group. Now create something great!
 |
 */
-
-Route::get('/', function () {
-    return view('welcome');
-});
 
 Route::get('test', function() {
     //event(new CurrencyUpdated());
@@ -28,18 +26,7 @@ Route::get('test', function() {
 
 Route::view('testing', 'testing');
 
-Route::get('test2', function() {
-    $file1 = 'monobank/currency/2023-04-01 21-54-07 monobank-currency.json';
-    $file2 = 'monobank/currency/2023-04-01 21-54-46 monobank-currency.json';
-    $file1 = Storage::disk('public')->get($file1);
-    $file2 = Storage::disk('public')->get($file2);
+Route::get('/', function () {
 
-    dd(
-        md5($file1),
-        md5($file2),
-        md5($file1),
-        md5($file2),
-    );
-
-    return response()->json('done');
+    return Inertia::render('Welcome', []);
 });

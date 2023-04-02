@@ -9,3 +9,7 @@
 
 # Used technologies
  - Found of actions. Using lorisleiva/laravel-actions
+
+
+# TODO
+ - PHP Code Sniffer, PHP Stan, Laravel Pint
