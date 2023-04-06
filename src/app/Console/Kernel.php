@@ -17,7 +17,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        $schedule->command('monobank:broadcast-currency-updated')->everyFiveMinutes();
+        $schedule->command('monobank:broadcast-currency-updated')->everyMinute();
     }
 
     /**

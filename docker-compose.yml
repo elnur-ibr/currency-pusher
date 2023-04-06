@@ -1,0 +1,82 @@
+version: '3.8'
+
+services:
+  nginx:
+    build:
+      context: .
+      dockerfile: ./docker/nginx.dockerfile
+    container_name: nginx_currecy
+    restart: unless-stopped
+    ports:
+      - 80:80
+    volumes:
+      - ./src:/var/www/html
+    depends_on:
+      - mysql
+      - php
+  mysql:
+    image: mysql/mysql-server:8.0
+    container_name: mysql_currency
+    restart: unless-stopped
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: ''
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ALLOW_EMPTY_PASSWORD: 0
+    volumes:
+      - volume-mysql-8.0:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-p${DB_PASSWORD}" ]
+      retries: 3
+      timeout: 5s
+  php:
+    build:
+      context: .
+      dockerfile: docker/php.dockerfile
+    container_name: php_currency
+    restart: unless-stopped
+    volumes:
+      - ./src:/var/www/html
+    working_dir: /var/www/html
+  cron:
+    build:
+      context: .
+      dockerfile: docker/cron.dockerfile
+    container_name: cron_currency
+    restart: unless-stopped
+    volumes:
+      - ./src:/var/www/html
+    working_dir: /var/www/html
+  composer:
+    build:
+      context: .
+      dockerfile: docker/composer.dockerfile
+    container_name: composer_currency
+    volumes:
+      - ./src:/var/www/html
+    working_dir: /var/www/html
+  npm:
+    image: node:current-alpine
+    container_name: npm_currency
+    volumes:
+      - ./src:/var/www/html
+    entrypoint: ["npm"]
+    working_dir: /var/www/html
+  artisan:
+    build:
+      context: .
+      dockerfile: docker/php.dockerfile
+    container_name: artisan_currency
+    user: laravel
+    volumes:
+      - ./src:/var/www/html
+    working_dir: /var/www/html
+    depends_on:
+      - mysql
+    entrypoint: ["php", "/var/www/html/artisan"]
+volumes:
+  volume-mysql-8.0:
+    driver: local
