@@ -22,7 +22,7 @@ class BroadcastUpdatedCurrency
         $this->data = GetCurrency::run();
 
         if ($this->isCurrencyUpdated()) {
-            event(new CurrencyUpdatedEvent());
+            event(new CurrencyUpdatedEvent('Monobank currency updatet at'.now()->toDateTimeString()));
         }
     }
 

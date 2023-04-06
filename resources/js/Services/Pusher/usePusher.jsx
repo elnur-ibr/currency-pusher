@@ -8,12 +8,12 @@ const pusher = new Pusher('1677401d496e6d9fdceb', {
 
 const channel = pusher.subscribe('monobank');
 
-channel.bind('currency-updated', function () {
+channel.bind('currency-updated', function (data) {
   console.log('Received event')
-  alert('Received event')
+  alert(data)
 });
 
-const usePusher = () => {
+const usePusher = (channel, event) => {
 
 }
 

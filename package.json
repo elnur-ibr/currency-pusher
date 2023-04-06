@@ -19,6 +19,7 @@
         "vite": "^4.0.0"
     },
     "dependencies": {
+        "pusher-js": "^8.0.2",
         "react-pusher": "^0.2.0",
         "react-query": "^3.39.3"
     }
